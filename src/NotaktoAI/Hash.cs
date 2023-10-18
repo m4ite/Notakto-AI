@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace NotaktoAI;
 
-public class Hash
+public static class Hash
 {
     const int BOARD_LENGTH = 9;
     const int MATRIX_ORDER = 3;

@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
+using System.Threading;
 using NotaktoAI;
 
 internal class Program
@@ -10,27 +11,44 @@ internal class Program
         if (args.Length != 2)
             throw new Exception();
 
-        string fileName = args[0] + ".txt";
-        string[] lines = File.ReadAllLines(fileName);
-        // ADD NEW LINE 
-        // lines = lines.Append("tabuleiro posição").ToArray();
+        string fileName = args[0];
+        string movesFiles = $"{fileName}.txt";
+        string lastMoveFile = $"{fileName} last.txt";
 
+        var sw = new Stopwatch();
 
+        sw.Start();
 
+        Tree tree = new(int.Parse(args[1]), 4);
 
+        sw.Stop();
 
-        int boardsNum = int.Parse(args[1]);
+        Console.WriteLine("Elapsed={0}", sw.Elapsed);
 
-        var gameBoards = Enumerable
-            .Range(0, boardsNum)
-            .Select(_ => new bool[9])
-            .ToArray();
+        while (true)
+        {
+            if (!File.Exists(lastMoveFile))
+                continue;
 
-        gameBoards[0][0] = true;
-        gameBoards[0][1] = true;
-        gameBoards[0][2] = true;
+            var lastMove = GetLastMove(lastMoveFile);
 
-        // foreach (var board in gameBoards)
-        //     Console.WriteLine($"Is valid board {Hash.Check(board)}");
+            tree.Update(lastMove);
+
+            var move = tree.Minimax();
+
+            Thread.Sleep(1000);
+        }
+    }
+
+    static Move GetLastMove(string file)
+    {
+        var line = File.ReadAllLines(file)[0].Split(' ');
+        
+        var board = int.Parse(line[0]);
+        var space = int.Parse(line[1]);
+
+        File.Delete(file);
+
+        return new Move(board, space);
     }
 }
