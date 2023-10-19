@@ -5,34 +5,32 @@ namespace NotaktoAI;
 
 public class Node
 {
-    public readonly bool[][] Board;
-    public Move PrevMove { get; private set; }
+    private readonly bool[][] Board;
+    public readonly Move PrevMove;
+    public readonly List<Node> Children = new();
     public float Value { get; private set; } = 0;
-    public List<Node> Children { get; private set; } = new();
-    public Node? Father { get; private set; }
 
     public Node(bool[][] board)
         => Board = board;
 
-    public Node(bool[][] board, Move move, Node father)
+    public Node(bool[][] board, Move move)
     {
         board[move.Board][move.Space] = true;
         Board = board;
         PrevMove = move;
-        Father = father;
     }
 
     public List<Node> GetChildren()
     {
         if (Children.Count == 0)
-            return Children;
+            return new List<Node>() { this };
 
         return Children.SelectMany(c => c.GetChildren()).ToList();
     }
 
     public void GenChildren()
     {
-        if (Board.All(hash => !Hash.Check(hash)))
+        if (Hash.GameEnded(Board))
             return;
 
         for (int i = 0; i < Board.Length; i++)
@@ -46,7 +44,7 @@ public class Node
                 var space = hash[j];
                 if (!space)
                 {
-                    var node = new Node(CloneBoard(Board), new(i, j), this);
+                    var node = new Node(Hash.CloneBoard(Board), new(i, j));
                     Children.Add(node);
                 }
             }
@@ -55,8 +53,12 @@ public class Node
 
     private float Heuristic(bool ImPlaying)
     {
-        if (Board.All(hash => !Hash.Check(hash)))
+        if (Hash.GameEnded(Board))
             return ImPlaying ? float.NegativeInfinity : float.PositiveInfinity;
+
+
+        if (PrevMove.Space == 4)
+            return 0.5f * (ImPlaying ? 1 : -1);
 
         return 0f;
     }
@@ -66,47 +68,17 @@ public class Node
         if (Children.Count == 0 || depth == 0)
             return (PrevMove, Heuristic(maximize));
 
-        Move move = PrevMove;
+        var minimax = Children.Select(c => c.Minimax(!maximize, depth - 1));
+
+        (Move Move, float Value) res;
 
         if (maximize)
-        {
-            Value = float.NegativeInfinity;
-
-            foreach (var child in Children)
-            {
-                var res = child.Minimax(false, depth - 1);
-                if (Value < res.Value)
-                {
-                    Value = res.Value;
-                    move = res.Move;
-                }
-            }
-        }
+            res = minimax.MaxBy(r => r.Value);
         else
-        {
-            Value = float.PositiveInfinity;
+            res = minimax.MinBy(r => r.Value);
 
-            foreach (var child in Children)
-            {
-                var res = child.Minimax(true, depth - 1);
-                if (Value > res.Value)
-                {
-                    Value = res.Value;
-                    move = res.Move;
-                }
-            }
-        }
+        Value = res.Value;
 
-        return (move, Value);
-    }
-
-    private static bool[][] CloneBoard(bool[][] board)
-    {
-        var newBoard = new bool[board.Length][];
-
-        for (int i = 0; i < board.Length; i++)
-            newBoard[i] = (bool[])board[i].Clone();
-
-        return newBoard;
+        return res;
     }
 }

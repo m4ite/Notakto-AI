@@ -5,22 +5,22 @@ namespace NotaktoAI;
 
 public static class Hash
 {
-    private const int BOARD_LENGTH = 9;
+    private const int HASH_LENGTH = 9;
     private const int MATRIX_ORDER = 3;
 
-    public static bool Check(bool[] board)
+    public static bool Check(bool[] hash)
     {
-        if (board.Length != BOARD_LENGTH)
-            throw new Exception("Invalid board for a hash game");
+        if (hash.Length != HASH_LENGTH)
+            throw new Exception("Invalid length for a hash game");
 
         var points = new int[8];
 
-        for (int i = 0; i < BOARD_LENGTH; i++)
+        for (int i = 0; i < HASH_LENGTH; i++)
         {
             int row = i / MATRIX_ORDER;
             int col = i % MATRIX_ORDER;
 
-            if (!board[i])
+            if (!hash[i])
                 continue;
 
             if (row == col)
@@ -34,5 +34,18 @@ public static class Hash
         }
 
         return !points.Any(p => p == 3);
+    }
+
+    public static bool GameEnded(bool[][] board)
+        => board.All(hash => !Check(hash));
+
+    public static bool[][] CloneBoard(bool[][] board)
+    {
+        var newBoard = new bool[board.Length][];
+
+        for (int i = 0; i < board.Length; i++)
+            newBoard[i] = (bool[])board[i].Clone();
+
+        return newBoard;
     }
 }

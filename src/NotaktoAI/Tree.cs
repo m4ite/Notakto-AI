@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -35,7 +36,6 @@ public class Tree
     public void Update(Move move)
     {
         Root = Root.Children.First(c => c.PrevMove == move);
-
         Root.GetChildren().ForEach(c => c.GenChildren());
     }
 }
