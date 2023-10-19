@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using NotaktoAI;
@@ -15,15 +14,10 @@ internal class Program
         string movesFiles = $"{fileName}.txt";
         string lastMoveFile = $"{fileName} last.txt";
 
-        var sw = new Stopwatch();
-
-        sw.Start();
-
         Tree tree = new(int.Parse(args[1]), 4);
 
-        sw.Stop();
-
-        Console.WriteLine("Elapsed={0}", sw.Elapsed);
+        if (fileName == "M1")
+            Play();
 
         while (true)
         {
@@ -34,16 +28,26 @@ internal class Program
 
             tree.Update(lastMove);
 
-            var move = tree.Minimax();
+            Play();
 
             Thread.Sleep(1000);
         }
-    }
 
-    static Move GetLastMove(string file)
+        void Play()
+        {
+            var move = tree.Minimax();
+
+            using (StreamWriter sw = File.AppendText(movesFiles))
+                sw.WriteLine(move.ToString());
+            
+            tree.Update(move);
+        }
+    }
+    
+    private static Move GetLastMove(string file)
     {
         var line = File.ReadAllLines(file)[0].Split(' ');
-        
+
         var board = int.Parse(line[0]);
         var space = int.Parse(line[1]);
 

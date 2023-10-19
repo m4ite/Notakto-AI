@@ -5,8 +5,8 @@ namespace NotaktoAI;
 
 public static class Hash
 {
-    const int BOARD_LENGTH = 9;
-    const int MATRIX_ORDER = 3;
+    private const int BOARD_LENGTH = 9;
+    private const int MATRIX_ORDER = 3;
 
     public static bool Check(bool[] board)
     {

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System;
 
 namespace NotaktoAI;
 
@@ -23,16 +22,29 @@ public class Node
         Father = father;
     }
 
+    public List<Node> GetChildren()
+    {
+        if (Children.Count == 0)
+            return Children;
+
+        return Children.SelectMany(c => c.GetChildren()).ToList();
+    }
+
     public void GenChildren()
     {
+        if (Board.All(hash => !Hash.Check(hash)))
+            return;
+
         for (int i = 0; i < Board.Length; i++)
         {
             if (!Hash.Check(Board[i]))
                 continue;
 
-            for (int j = 0; j < Board[i].Length; j++)
+            var hash = Board[i];
+            for (int j = 0; j < hash.Length; j++)
             {
-                if (!Board[i][j])
+                var space = hash[j];
+                if (!space)
                 {
                     var node = new Node(CloneBoard(Board), new(i, j), this);
                     Children.Add(node);
@@ -41,32 +53,54 @@ public class Node
         }
     }
 
-    float Heuristic(bool ImPlaying)
+    private float Heuristic(bool ImPlaying)
     {
         if (Board.All(hash => !Hash.Check(hash)))
-        {
-            Console.WriteLine("entrou");
             return ImPlaying ? float.NegativeInfinity : float.PositiveInfinity;
-        }
 
         return 0f;
     }
 
-    public float Minimax(bool maximize, int depth)
+    public (Move Move, float Value) Minimax(bool maximize, int depth)
     {
         if (Children.Count == 0 || depth == 0)
-            return Heuristic(maximize);
+            return (PrevMove, Heuristic(maximize));
 
-        Value = maximize ? float.NegativeInfinity : float.PositiveInfinity;
-        Func<float, float, float> minimax = maximize ? float.Max : float.Min;
+        Move move = PrevMove;
 
-        foreach (var child in Children)
-            Value = minimax(Value, child.Minimax(!maximize, depth - 1));
+        if (maximize)
+        {
+            Value = float.NegativeInfinity;
 
-        return Value;
+            foreach (var child in Children)
+            {
+                var res = child.Minimax(false, depth - 1);
+                if (Value < res.Value)
+                {
+                    Value = res.Value;
+                    move = res.Move;
+                }
+            }
+        }
+        else
+        {
+            Value = float.PositiveInfinity;
+
+            foreach (var child in Children)
+            {
+                var res = child.Minimax(true, depth - 1);
+                if (Value > res.Value)
+                {
+                    Value = res.Value;
+                    move = res.Move;
+                }
+            }
+        }
+
+        return (move, Value);
     }
 
-    static bool[][] CloneBoard(bool[][] board)
+    private static bool[][] CloneBoard(bool[][] board)
     {
         var newBoard = new bool[board.Length][];
 
