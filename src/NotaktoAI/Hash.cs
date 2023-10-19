@@ -8,6 +8,15 @@ public static class Hash
     private const int HASH_LENGTH = 9;
     private const int MATRIX_ORDER = 3;
 
+    public static bool[][] GenBoard(int hashNum)
+    {
+        var board = new bool[hashNum][];
+        for (int i = 0; i < hashNum; i++)
+            board[i] = new bool[HASH_LENGTH];
+
+        return board;
+    }
+
     public static bool Check(bool[] hash)
     {
         if (hash.Length != HASH_LENGTH)
@@ -36,6 +45,7 @@ public static class Hash
         return !points.Any(p => p == 3);
     }
 
+    // TODO: Improving
     public static bool GameEnded(bool[][] board)
         => board.All(hash => !Check(hash));
 

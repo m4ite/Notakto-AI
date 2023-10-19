@@ -5,7 +5,7 @@ namespace NotaktoAI;
 
 public class Node
 {
-    private readonly bool[][] Board;
+    public readonly bool[][] Board;
     public readonly Move PrevMove;
     public readonly List<Node> Children = new();
     public float Value { get; private set; } = 0;

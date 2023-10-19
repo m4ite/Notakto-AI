@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,14 +8,9 @@ public class Tree
     public Node Root { get; private set; }
     private readonly int Depth;
 
-    public Tree(int boardsNum, int depth)
+    public Tree(int hashNum, int depth)
     {
-        var board = Enumerable
-            .Range(0, boardsNum)
-            .Select(_ => new bool[9])
-            .ToArray();
-
-        Root = new(board);
+        Root = new(Hash.GenBoard(hashNum));
         Depth = depth;
 
         IEnumerable<Node> children = new Node[] { Root };
