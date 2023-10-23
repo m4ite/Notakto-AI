@@ -1,5 +1,4 @@
 using System.IO;
-using System.Linq;
 
 namespace NotaktoAI;
 
@@ -27,7 +26,7 @@ public class Game
     }
 
     public bool IsRunning()
-        => Hash.GameEnded(tree.Root.Board);
+        => Board.IsValid(tree.Root.GameBoard);
 
     public void Play()
     {

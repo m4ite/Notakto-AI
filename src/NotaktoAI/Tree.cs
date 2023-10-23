@@ -10,7 +10,7 @@ public class Tree
 
     public Tree(int hashNum, int depth)
     {
-        Root = new(Hash.GenBoard(hashNum));
+        Root = new(Board.Generate(hashNum));
         Depth = depth;
 
         IEnumerable<Node> children = new Node[] { Root };

@@ -4,7 +4,7 @@ using NotaktoAI;
 
 internal class Program
 {
-    const int DEPTH = 10;
+    const int DEPTH = 4;
 
     private static void Main(string[] args)
     {
@@ -14,7 +14,7 @@ internal class Program
         string fileName = args[0];
         int hashNum = int.Parse(args[1]);
 
-        Game game = new(fileName, hashNum, DEPTH);
+        var game = new Game(fileName, hashNum, DEPTH);
 
         while (game.IsRunning())
         {

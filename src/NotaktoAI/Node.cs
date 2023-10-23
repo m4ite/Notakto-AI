@@ -5,18 +5,18 @@ namespace NotaktoAI;
 
 public class Node
 {
-    public readonly bool[][] Board;
+    public readonly bool[][] GameBoard;
     public readonly Move PrevMove;
     public readonly List<Node> Children = new();
     public float Value { get; private set; } = 0;
 
     public Node(bool[][] board)
-        => Board = board;
+        => GameBoard = board;
 
     public Node(bool[][] board, Move move)
     {
         board[move.Board][move.Space] = true;
-        Board = board;
+        GameBoard = board;
         PrevMove = move;
     }
 
@@ -30,21 +30,21 @@ public class Node
 
     public void GenChildren()
     {
-        if (Hash.GameEnded(Board))
+        if (!Board.IsValid(GameBoard))
             return;
 
-        for (int i = 0; i < Board.Length; i++)
+        for (int i = 0; i < GameBoard.Length; i++)
         {
-            if (!Hash.Check(Board[i]))
+            if (!Hash.IsValid(GameBoard[i]))
                 continue;
 
-            var hash = Board[i];
+            var hash = GameBoard[i];
             for (int j = 0; j < hash.Length; j++)
             {
                 var space = hash[j];
                 if (!space)
                 {
-                    var node = new Node(Hash.CloneBoard(Board), new(i, j));
+                    var node = new Node(Board.Clone(GameBoard), new(i, j));
                     Children.Add(node);
                 }
             }
@@ -53,12 +53,12 @@ public class Node
 
     private float Heuristic(bool ImPlaying)
     {
-        if (Hash.GameEnded(Board))
+        if (!Board.IsValid(GameBoard))
             return ImPlaying ? float.NegativeInfinity : float.PositiveInfinity;
 
 
         if (PrevMove.Space == 4)
-            return 0.5f * (ImPlaying ? 1 : -1);
+            return ImPlaying ? 1 : -1;
 
         return 0f;
     }

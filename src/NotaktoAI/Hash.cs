@@ -1,23 +1,13 @@
 using System;
-using System.Linq;
 
 namespace NotaktoAI;
 
-public static class Hash
+internal static class Hash
 {
-    private const int HASH_LENGTH = 9;
     private const int MATRIX_ORDER = 3;
+    public const int HASH_LENGTH = 9;
 
-    public static bool[][] GenBoard(int hashNum)
-    {
-        var board = new bool[hashNum][];
-        for (int i = 0; i < hashNum; i++)
-            board[i] = new bool[HASH_LENGTH];
-
-        return board;
-    }
-
-    public static bool Check(bool[] hash)
+    public static bool IsValid(bool[] hash)
     {
         if (hash.Length != HASH_LENGTH)
             throw new Exception("Invalid length for a hash game");
@@ -42,20 +32,12 @@ public static class Hash
             points[row + 5]++;
         }
 
-        return !points.Any(p => p == 3);
-    }
+        foreach (var point in points)
+        {
+            if (point > 2)
+                return false;
+        }
 
-    // TODO: Improving
-    public static bool GameEnded(bool[][] board)
-        => board.All(hash => !Check(hash));
-
-    public static bool[][] CloneBoard(bool[][] board)
-    {
-        var newBoard = new bool[board.Length][];
-
-        for (int i = 0; i < board.Length; i++)
-            newBoard[i] = (bool[])board[i].Clone();
-
-        return newBoard;
+        return true;
     }
 }
