@@ -58,7 +58,7 @@ public class Node
 
 
         if (PrevMove.Space == 4)
-            return ImPlaying ? 1 : -1;
+            return ImPlaying ? -1 : 1;
 
         return 0f;
     }
